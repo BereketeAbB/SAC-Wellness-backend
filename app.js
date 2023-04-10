@@ -14,7 +14,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
 app.use('/user', userAuth, user)
-app.use('/admi', adminAuth, admin)
+app.use('/admin', adminAuth, admin)
 app.use('/service-provider', serviceProviderAuth, serviceProvider)
 
 const ADDR = process.env.ADDR || '127.0.0.1'
