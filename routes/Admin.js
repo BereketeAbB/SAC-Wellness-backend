@@ -1,28 +1,31 @@
 const express = require('express')
+const {Database} = require('../db/IDatabase')
 const router = express.Router()
 
 router.get('/', (req, res) => {
     res.end('admin working')
 })
 
-router.post('/addUser', (req, res)=>{
+router.post('/addAdmin', (req, res)=>{
     try {
         const {
-            f_name, 
+            f_name,
+            m_name,
             l_name,
             email,
-            username,
-            password,
-            stud_id
+            speciality,
+            working_hour,
+            communication,
+            phone_no
         } = req.body
-        console.log(f_name, l_name, email, username, password, stud_id)
-        res.end()
+        const db = new Database('mongo')
+        db.addAdmin(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
+        res.end('success')
     } catch (error) {
-        console.log(error)
+        res.end('error')
         return
     }
 
-    
 })
 
 module.exports = router
