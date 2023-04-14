@@ -41,7 +41,7 @@ router.post('/addServiceProvider', (req, res)=>{
             phone_no
         } = req.body
         const db = new Database('mongo')
-        db.addAdmin(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
+        db.addServiceProvider(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
         res.end('success')
     } catch (error) {
         res.end('error')
@@ -52,10 +52,10 @@ router.post('/addServiceProvider', (req, res)=>{
 
 //for this one we can make webhook style of thing to 
 //handle auto request notification
-router.get('/getClientRequests', (req, res) => {
+router.get('/getClientRequests', async (req, res) => {
     const db = new Database('mongo')
-    db.addAdmin(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
-    res.end('success')
+    let clientRequests = await db.getClientRequests()
+    res.statusCode(200).send(clientRequests)
 })
 
 //Other admin tools could be added here
