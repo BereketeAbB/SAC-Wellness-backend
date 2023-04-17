@@ -20,12 +20,10 @@ router.post('/addAdmin', (req, res)=>{
         } = req.body
         const db = new Database('mongo')
         db.addAdmin(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
-        res.end('success')
+        res.status(200).send({status : 'success'})
     } catch (error) {
-        res.end('error')
-        return
+        res.status(400).send({status : 'error', result : error})
     }
-
 })
 
 router.post('/addServiceProvider', (req, res)=>{
@@ -42,22 +40,31 @@ router.post('/addServiceProvider', (req, res)=>{
         } = req.body
         const db = new Database('mongo')
         db.addServiceProvider(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no)
-        res.end('success')
+        res.status(200).send({status : 'success'})
     } catch (error) {
-        res.end('error')
-        return
+        res.status(400).send({status : 'error', result : error})
     }
-
 })
 
-//for this one we can make webhook style of thing to 
-//handle auto request notification
 router.get('/getClientRequests', async (req, res) => {
     const db = new Database('mongo')
-    let clientRequests = await db.getClientRequests()
-    res.statusCode(200).send(clientRequests)
+    db.getClientRequests((clientRequests)=>{
+        res.status(200).send({status : 'success', result : clientRequests})
+    })
 })
 
-//Other admin tools could be added here
+router.post('/setWebhookClientRequests', async (req, res) => {
+    try {
+        const {
+            url
+        } = req.body
+        const db = new Database('mongo')
+        db.setWebhookClientReqests(url)
+        res.status(200).send({status : 'success'})
+    } catch (error) {
+        res.status(400).send({status : 'error', result : error})
+        return
+    }
+})
 
 module.exports = router

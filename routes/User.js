@@ -18,10 +18,9 @@ router.post('/addStudent', (req, res) => {
         } = req.body
         const db = new Database('mongo')
         db.addStudent(f_name, m_name, l_name, email, department, diagnosis)
-        res.end('success')
+        res.status(200).send({status : 'success'})
     } catch (error) {
-        res.end('error')
-        return
+        res.status(400).end({status : 'error'})
     }
 })
 
@@ -35,42 +34,51 @@ router.post('/addRequest', (req, res) => {
         } = req.body
         const db = new Database('mongo')
         db.addRequest(stud_id, req_team_id, service_provider_id, urgency)
-        res.end('success')
+        res.status(200).send({status : 'success'})
     } catch (error) {
-        res.end('error')
-        return
+        res.status(400).end({status : 'error', result : error})
     }
 })
 
 router.get('/getAppointment', async (req, res) => {
     const {stud_id} = req.params;
     const db = new Database('mongo')
-    const appointment = await db.getAppointment(stud_id)
-    res.end(appointment)
+
+    db.getAppointment(stud_id, (appointment)=> {
+        res.status(200).send({status : 'success', 'result' : appointment})
+    })
 })
 
 router.get('/getMedicalHealthTeam', async (req, res) => {
     const db = new Database('mongo')
-    const appointment = await db.getMedicalHealthTeam()
-    res.end(appointment)
+
+    db.getMedicalHealthTeam((medicalHealthTeam)=> {
+        res.status(200).send({status : 'success', 'result' : medicalHealthTeam})
+    })
 })
 
 router.get('/getMentalHealthTeam', async (req, res) => {
     const db = new Database('mongo')
-    const appointment = await db.getMentalHealthTeam()
-    res.end(appointment)
+
+    db.getMentalHealthTeam((mentalHealthTeam)=> {
+        res.status(200).send({status : 'success', 'result' : mentalHealthTeam})
+    })
 })
 
 router.get('/getAvailableMedicalHealthTeam', async (req, res) => {
     const db = new Database('mongo')
-    const appointment = await db.getAvailableMedicalHealthTeam()
-    res.end(appointment)
+
+    db.getAvailableMedicalHealthTeam((availableMedicalHealthTeam)=> {
+        res.status(200).send({status : 'success', 'result' : availableMedicalHealthTeam})
+    })
 })
 
 router.get('/getAvailableMentalHealthTeam', async (req, res) => {
     const db = new Database('mongo')
-    const appointment = await db.getAvailableMentalHealthTeam()
-    res.end(appointment)
+
+    db.getAvailableMentalHealthTeam((availableMentalHealthTeam)=> {
+        res.status(200).send({status : 'success', 'result' : availableMentalHealthTeam})
+    })
 })
 
 module.exports = router
