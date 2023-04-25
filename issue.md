@@ -1,0 +1,4 @@
+- Copy over token from email to app and website
+- Student and Client is being used interchangably
+- Callbacks are necessary for all write and read operations
+- not enough clear functions defined

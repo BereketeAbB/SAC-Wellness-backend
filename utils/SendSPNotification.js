@@ -1,6 +1,16 @@
+const { Database } = require('../db/IDatabase')
+
+const SPNotifier = function()
+{
+    this.db = new Database()    
+}
+
 /** 
  * TODO: get each service provider's avilable hours and compare it with current time
  */
+SPNotifier.prototype._getWorkingHours = function(callback) { 
+    this.db.getSPWorkingHours(callback)
+}
  
 /**
  * TODO: fetch everything that is suppose to be sent to service providers and call
