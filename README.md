@@ -8,7 +8,7 @@ To setup this project, follow the following steps.
 - `touch .env`
 - `echo 'PORT=5000' >> .env`
 - `echo 'ADDR=127.0.0.1' >> .env`
-- `echo 'MONGO_CONF=your mongo connection string' >> .env`
+- `echo 'MONGO_CONF=your mongo connecton string' >> .env`
 - `npm run dev`
 
 The above setup is for development setup and you can download the release version from release section.
