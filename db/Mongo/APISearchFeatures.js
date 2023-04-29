@@ -51,7 +51,7 @@ class APISearchFeatures {
         if(this.queryString.page){
             this.query = this.query.skip(skip).limit(limit)
         } else {
-            this.query = this.query.limit(10)           // The first 15 Documents
+            this.query = this.query.limit(15)           // The first 15 Documents
         }
         return this
     }
