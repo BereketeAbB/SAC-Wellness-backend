@@ -1,5 +1,7 @@
 // Implement interfaces defined in IDatabase file, specific to mongo db
 const mongoose = require('mongoose')
+const {APISearchFeatures} = require('./APISearchFeatures')
+const {Admin, Student, Physician, Request} = require('./SchemaModels)               
 require('dotenv').config()
 
 const MongoDb = function () {
