@@ -1,28 +1,18 @@
-// Implement interfaces defined in IDatabase file, specific to mongo db
 const mongoose = require('mongoose')
 const {APISearchFeatures} = require('./APISearchFeatures')
-const {Admin, Student, Physician, Request} = require('./SchemaModels)               
+const {Admin, ServiceProvider, Student, Request} = require('./SchemaModels')
 require('dotenv').config()
 
-const MongoDb = function () {
-    //TODO: initiating the connection with database here
-    //TODO: database URI can be taken from .env or can be set as a constant here
+const MongoDb = function () {                               // Connection to the Database
     mongoose.connect(process.env.MONGO_CONN).then(() => {
         console.log("MongoDB Connection Successful");
     })
 }
 
-
+    //function that adds a new Admin/Student/ServiceProvider/Request to the MongoDB and returns the result
 MongoDb.prototype.addAdmin = async function(f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no, callback) {
     await Admin.create({
-        f_name,
-        m_name, 
-        l_name, 
-        email, 
-        speciality, 
-        working_hour, 
-        communication, 
-        phone_no
+        f_name, m_name, l_name, email, speciality, working_hour, communication, phone_no
     }).then((data)=>{
         const ret = {status: true, ...data}
         callback(ret)
@@ -43,13 +33,8 @@ MongoDb.prototype.addStudent = async function (stud_id, f_name, l_name, email, p
 } 
 
 MongoDb.prototype.addServiceProvier = async function(f_name, m_name, l_name, email, callback) {
-    await Physician.create({
-        f_name, 
-        m_name, 
-        l_name, 
-        email,
-        ed_info, 
-        diagnosis
+    await ServiceProvider.create({
+        f_name, m_name, l_name, email, ed_info, diagnosis
     }).then((data)=>{
         const ret = {status: true, ...data}
         callback(ret)
@@ -58,13 +43,9 @@ MongoDb.prototype.addServiceProvier = async function(f_name, m_name, l_name, ema
     })
 }
 
-
 MongoDb.prototype.addRequest = async function(stud_id, req_team_id, service_provider_id, urgency, callback){
     await Request.create({
-            stud_id,
-            req_team_id, 
-            service_provider_id, 
-            urgency
+            stud_id, req_team_id, service_provider_id, urgency
         }).then((data)=>{
             const ret = {status: true, ...data}
             callback(ret)
@@ -73,14 +54,12 @@ MongoDb.prototype.addRequest = async function(stud_id, req_team_id, service_prov
         })
 }
 
-
+        //Functions that are used to find Admin/Student/ServiceProvider/Request from the MongoDB
 MongoDb.prototype.getStudents = async function(reqQ, callback){
     try {
         console.log("test");
         const studQ = new APISearchFeatures(Student.find(), reqQ).filter().sort().fields().page()
         const gettedStuds = await studQ.query
-        // gettedStuds[gettedStuds.length] = true;
-        // console.log(gettedStuds);
 
         callback(gettedStuds)
     } catch (err) {
@@ -88,10 +67,9 @@ MongoDb.prototype.getStudents = async function(reqQ, callback){
     }
 }
 
-
 MongoDb.prototype.getServiceProviders = async function(reqQ, callback){
     try {
-        const SP = new APISearchFeatures(Physician.find(), reqQ).filter().sort().fields().page()
+        const SP = new APISearchFeatures(ServiceProvider.find(), reqQ).filter().sort().fields().page()
         const gettedSP = await SP.query
 
         callback(gettedSP)
