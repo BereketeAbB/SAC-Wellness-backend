@@ -57,11 +57,8 @@ const adminSchema = new mongoose.Schema({
 module.exports.Admin = mongoose.model('Admin', adminSchema)
 
 
-
-
-
-// Physician's Schema and Model
-const physicianSchema = new mongoose.Schema({
+// ServiceProvider's Schema and Model
+const serviceProviderSchema = new mongoose.Schema({
     stud_id: {
         type: String,
         required: [true, 'Student ID cannot be set empty']
@@ -89,7 +86,7 @@ const physicianSchema = new mongoose.Schema({
             type: String
             //
         }
-        //
+        // Add Some Additional
     },
     work_exp:{
 
@@ -104,11 +101,9 @@ const physicianSchema = new mongoose.Schema({
             type: Date,
             required: [true, "ending time must be set"]
         }
-
     }
-
 })
-module.exports.Physician = mongoose.model('Physician', physicianSchema)
+module.exports.ServiceProvider = mongoose.model('ServiceProvider', serviceProviderSchema)
 
 
 // Request
