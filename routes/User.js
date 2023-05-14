@@ -2,6 +2,8 @@ const router = require("express").Router();
 const { Database } = require("../db/IDatabase");
 require("dotenv").config();
 
+const db = new Database('test')
+
 router.get("/", (req, res) => {
 	console.log(req);
 	res.json("user working");
@@ -18,7 +20,6 @@ router.post("/addStudent", (req, res) => {
 router.post("/addRequest", (req, res) => {
 	try {
 		const { stud_id, req_team_id, service_provider_id, urgency } = req.body;
-		const db = new Database("mongo");
 		db.addRequest(stud_id, req_team_id, service_provider_id, urgency);
 		res.status(200).json({ status: "success" });
 	} catch (error) {
@@ -28,7 +29,6 @@ router.post("/addRequest", (req, res) => {
 
 router.get("/getAppointment", async (req, res) => {
 	const { stud_id } = req.params;
-	const db = new Database("mongo");
 
 	db.getAppointment(stud_id, (appointment) => {
 		res.status(200).json({ status: "success", result: appointment });
@@ -36,7 +36,6 @@ router.get("/getAppointment", async (req, res) => {
 });
 
 router.get("/getMedicalHealthTeam", async (req, res) => {
-	const db = new Database("mongo");
 
 	db.getMedicalHealthTeam((medicalHealthTeam) => {
 		res.status(200).json({ status: "success", result: medicalHealthTeam });
@@ -44,7 +43,6 @@ router.get("/getMedicalHealthTeam", async (req, res) => {
 });
 
 router.get("/getMentalHealthTeam", async (req, res) => {
-	const db = new Database("mongo");
 
 	db.getMentalHealthTeam((mentalHealthTeam) => {
 		res.status(200).json({ status: "success", result: mentalHealthTeam });
@@ -52,7 +50,6 @@ router.get("/getMentalHealthTeam", async (req, res) => {
 });
 
 router.get("/getAvailableMedicalHealthTeam", async (req, res) => {
-	const db = new Database("mongo");
 
 	db.getAvailableMedicalHealthTeam((availableMedicalHealthTeam) => {
 		res.status(200).json({
@@ -63,7 +60,6 @@ router.get("/getAvailableMedicalHealthTeam", async (req, res) => {
 });
 
 router.get("/getAvailableMentalHealthTeam", async (req, res) => {
-	const db = new Database("mongo");
 
 	db.getAvailableMentalHealthTeam((availableMentalHealthTeam) => {
 		res.status(200).json({

@@ -2,6 +2,8 @@ const express = require("express");
 const { Database } = require("../db/IDatabase");
 const router = express.Router();
 
+const db = new Database("mongo");
+
 router.get("/", (req, res) => {
 	res.end("admin working");
 });
@@ -18,7 +20,7 @@ router.post("/signup", (req, res) => {
 			communication,
 			phone_no,
 		} = req.body;
-		const db = new Database("mongo");
+
 		db.addAdmin(
 			f_name,
 			m_name,
@@ -47,7 +49,6 @@ router.post("/addServiceProvider", (req, res) => {
 			communication,
 			phone_no,
 		} = req.body;
-		const db = new Database("mongo");
 		db.addServiceProvider(
 			f_name,
 			m_name,
@@ -85,7 +86,6 @@ router.post("/login", (req, res) => {
 });
 
 router.get("/getClientRequests", async (req, res) => {
-	const db = new Database("mongo");
 	db.getClientRequests((clientRequests) => {
 		res.status(200).send({
 			status: "success",

@@ -2,6 +2,8 @@ const express = require('express')
 const { Database } = require('../db/IDatabase')
 const router = express.Router()
 
+const db = new Database('test')
+
 router.get('/', (req, res) => {
     console.log(req)
     res.end('service provider working')
@@ -13,7 +15,6 @@ router.post('/login', (req, res) => {
             email
         } = req.body
 
-        const db = new Database('test')
         if (!validator.isEmail(email))
         {
             res.status(400).json({status : 'error', result : "Invalid email : email should look like eg. example@example.com"})
@@ -77,7 +78,6 @@ router.post('/setAppointment', (req, res) => {
             remark
         } = req.body
 
-        const db = new Database('mongo')
         db.setAppointment(stud_id, date, hour, minute, remark, (result)=>{
             if (result)
                 res.status(200).json({status : 'success', result : {msg : 'Appointment set successfully.'}})
@@ -90,7 +90,6 @@ router.post('/setAppointment', (req, res) => {
 })
 
 router.get('/getClientRequests', async (req, res) => {
-    const db = new Database('mongo')
     db.getClientRequests(( clientRequests )=>{
         res.status(200).send({
             status : 'success', 
@@ -103,7 +102,6 @@ router.get('/getClientRequests', async (req, res) => {
 })
 
 router.get('/getAppointments', (req, res) => {
-    const db = new Database('mongo')
     db.getAppointment((appointments) => {
         res.status(200).send({
             status : 'success', 
