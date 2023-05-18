@@ -1,36 +1,33 @@
 const router = require("express").Router();
-const { Database } = require("../db/IDatabase");
 require("dotenv").config();
 
-const db = new Database('test')
+const {db} = require('../Mongo/Mongo')
 
 router.get("/", (req, res) => {
 	console.log(req);
 	res.json("user working");
 });
 
-router.post("/login", (req, res) => {
-	//change of plans
-});
 
-router.post("/addStudent", (req, res) => {
-	/**Change of plans */
-});
-
-router.post("/addRequest", (req, res) => {
+router.post("/addRequest", (req, res) => {		//Checked
 	try {
-		const { stud_id, req_team_id, service_provider_id, urgency } = req.body;
-		db.addRequest(stud_id, req_team_id, service_provider_id, urgency);
-		res.status(200).json({ status: "success" });
+		const { stud_id, req_team_id, service_provider_id, issuedAt, urgency } = req.body;
+		db.addRequest(stud_id, req_team_id, service_provider_id, issuedAt, urgency, (result)=> {
+			if(result.status)
+				return res.status(200).json({ status: "success"});
+			throw new Error("Request Adding failed")
+
+		});
 	} catch (error) {
 		res.status(400).json({ status: "error", result: error });
 	}
 });
 
+
 router.get("/getAppointment", async (req, res) => {
 	const { stud_id } = req.params;
 
-	db.getAppointment(stud_id, (appointment) => {
+	db.getAppointments(stud_id, (appointment) => {
 		res.status(200).json({ status: "success", result: appointment });
 	});
 });
@@ -70,7 +67,7 @@ router.get("/getAvailableMentalHealthTeam", async (req, res) => {
 });
 
 /**
- * all private properties below this!
+ * all private wproperties below this!
  */
 
 let _createToken = (email, user_id) => {

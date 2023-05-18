@@ -28,7 +28,7 @@ class APISearchFeatures {
             this.query = this.query.sort(sortBy)
         } 
         else {
-            this.query = query.sort({"_id": 1})                    //default sort type
+            this.query = this.query.sort({"_id": 1})                    //default sort type
         } 
         return this
     }
