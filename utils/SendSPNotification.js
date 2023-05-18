@@ -1,8 +1,9 @@
-const { Database } = require('../db/IDatabase')
+const {db} = require('./../db/Mongo/Mongo')
+
 
 const SPNotifier = function()
 {
-    this.db = new Database()    
+      
 }
 
 /** 

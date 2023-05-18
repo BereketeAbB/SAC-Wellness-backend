@@ -1,8 +1,6 @@
 const express = require("express");
-const { Database } = require("../db/IDatabase");
 const router = express.Router();
-
-const db = new Database("mongo");
+const {db} = require('../Mongo/Mongo')
 
 router.get("/", (req, res) => {
 	res.end("admin working");
@@ -29,9 +27,14 @@ router.post("/signup", (req, res) => {
 			speciality,
 			working_hour,
 			communication,
-			phone_no
+			phone_no,
+			(result)=> {
+				if(result.status){
+					return res.status(200).send({ status: "success" });
+				} else 
+					return res.status(400).send({ status: "error", result: error });
+			}
 		);
-		res.status(200).send({ status: "success" });
 	} catch (error) {
 		res.status(400).send({ status: "error", result: error });
 	}
@@ -81,20 +84,90 @@ router.post("/addServiceProvider", (req, res) => {
 	}
 });
 
-router.post("/login", (req, res) => {
-	//CHANGE of plans
-});
+router.post("/getServiceProvider", (req, res) => {
+	try {
+		const {email} = req.body
 
-router.get("/getClientRequests", async (req, res) => {
-	db.getClientRequests((clientRequests) => {
-		res.status(200).send({
-			status: "success",
-			result: {
-				msg: "Request fetched successfully.",
-				data: clientRequests,
-			},
-		});
-	});
-});
+		db.getServiceProviders({email}, (result)=> {
+			if(result.status) {
+				res.status(200).json({
+					status: "success",
+					data: result.result
+				})
+			}
+			else
+				throw new Error(result.msg)
+		})
+	} catch (error) {
+		res.status(404).json({
+			status: failed,
+			name: error.name,
+			msg: error.message
+		})
+	}
+})
+
+router.get("/getRequests", (req, res) => {	//Checked
+	try {
+		const {stud_id, req_team,_id, service_provider_id, issuedAt} = req.body
+
+		db.getRequests({stud_id, req_team,_id, service_provider_id, issuedAt}, (result)=> {
+			if(result.status) {
+				res.status(200).json({
+					status: "success",
+					data: result.result
+				})
+			}
+			else
+			res.status(404).json({
+				status: "failed",
+				msg: result.msg
+			})
+		})
+	} catch (error) {
+		console.log(error);
+		res.status(404).json({
+			status: "failed",
+			name: error.name,
+			msg: error.message
+		})
+	}
+})
+
+router.get('/getAppointments', (req, res) => {
+    try {
+        const {
+            student_id,
+            request_id,
+            serviceProvider,
+            time,
+            remark
+        } = req.body
+
+        const reqQueryObj = {student_id, request_id, serviceProvider, time, remark}
+
+        db.getAppointments(reqQueryObj, (result) => {
+            if(result.status){
+                res.status(200).send({
+                    status : 'success', 
+                    result : {
+                        msg : 'Appointments fetched succefully.',
+                        data : result.result
+                    }
+                })
+            } else{
+                res.status(404).json({
+                    status: 'error',
+                    msg: 'No appointment found'
+                })
+            }
+        })
+    } catch (error) {
+        res.status(404).json({
+            status: 'error',
+            msg: error.message
+        })
+    }
+})
 
 module.exports = router;

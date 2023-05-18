@@ -8,6 +8,7 @@ const studentSchema = new mongoose.Schema({
 	},
 	f_name: String,
 	l_name: String,
+	full_name: String,
 	email: {
 		type: String,
 		required: [true, "Email cannot be empty"],
@@ -27,7 +28,12 @@ const studentSchema = new mongoose.Schema({
 	},
 	diagnosis: [{}, {}, {}],
 });
-module.exports.Student = mongoose.model("Student", studentSchema);
+studentSchema.pre('save', function(next){
+	this.full_name = `${this.f_name} ${this.l_name}`
+	next()
+})
+
+const Student = mongoose.model("Student", studentSchema);
 
 // Admin's Schema and Model
 const adminSchema = new mongoose.Schema({
@@ -52,11 +58,11 @@ const adminSchema = new mongoose.Schema({
 		required: [true, "Admin Phone Number missing"],
 	},
 });
-module.exports.Admin = mongoose.model("Admin", adminSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
 // ServiceProvider's Schema and Model
 const serviceProviderSchema = new mongoose.Schema({
-	stud_id: {
+	provider_id: {
 		type: String,
 		required: [true, "Student ID cannot be set empty"],
 	},
@@ -89,18 +95,20 @@ const serviceProviderSchema = new mongoose.Schema({
 	availabile_at: {
 		starting_time: {
 			type: Date,
-			required: [true, "Starting time must be set"],
+			//required: [true, "Starting time must be set"],
 		},
 		ending_time: {
 			type: Date,
-			required: [true, "ending time must be set"],
+			//required: [true, "ending time must be set"],
 		},
 	},
 });
-module.exports.ServiceProvider = mongoose.model(
-	"ServiceProvider",
-	serviceProviderSchema
-);
+serviceProviderSchema.pre('save', function(next){
+	this.full_name = `${this.f_name} ${this.l_name}`
+	next()
+})
+const ServiceProvider = mongoose.model('ServiceProvider', serviceProviderSchema)
+
 
 // Request
 const requestSchema = new mongoose.Schema({
@@ -116,6 +124,47 @@ const requestSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "Service Provider cannot be empty"],
 	},
+	issuedAt: {
+		type: Date,
+		default: Date.now
+	},
 	urgency: String,
 });
-module.exports.Request = mongoose.model("Request", requestSchema);
+const Request = mongoose.model("Request", requestSchema);
+
+
+// Appointment
+const AppointmentSchema = new mongoose.Schema({
+	student_id: {
+		type: String,	// mongoose.Schema.ObjectId
+		//required: [true, "An appointment must have the ID of the Student"]
+	},
+	request_id: {
+		type: mongoose.Schema.ObjectId,
+		ref: 'Request',
+		//required: [true, "Request must be refered by the appointment"]
+	},
+	service_provider_id: {
+		type: String,
+		// required: [true, "An appointment must have the ID of the Service Provider"]
+	},
+	time: {
+		type: Date,
+		// required: [true, "Starting time must be specified"]
+	},
+	status: {
+		type: String,
+		enum: ["rejected", "pending", "Accepted"],
+		default: "pending"
+	},
+	remark: String
+})
+
+AppointmentSchema.pre('save', async function(next){
+	this.request = await Student.findById(this.request_id)
+	// this.student = await Student.findOne({stud_id: this.student}).select("+stud_id +email +full_name")
+	// this.serviceProvider = await ServiceProvider.findOne({provider_id: this.serviceProvider}).select("+provider_id +full_name")
+})
+const Appointment = mongoose.model("Appointment", AppointmentSchema)
+
+module.exports = {Student, ServiceProvider, Admin, Request, Appointment}
