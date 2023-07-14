@@ -116,6 +116,24 @@ router.get('/getAppointments', (req, res)=>{
     }
 })
 
+router.get('/getAppointment/:appointmentId', (req, res)=>{
+    if (req.params.appointmentId)
+    {
+        db.getAppointment(req.params.appointmentId, (result)=>{
+            if(result.status)
+                res.status(200).json({
+                    status: "success",
+                    data: result.result
+                })
+            else 
+                res.status(400).json({
+                    status: "error",
+                    msg: result.msg
+                })
+        })
+    }
+})
+
 /** 
  * all private properties below this!
  */

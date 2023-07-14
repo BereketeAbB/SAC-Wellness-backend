@@ -4,8 +4,8 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 // const validator = require('validator')                                                                                                               );
 const mongoose = require('mongoose')
-const {sendEmail} = require("./utils/Email")
-// const { sendEmail, validator } = require("./utils/Email");    
+// const {sendEmail} = require("./utils/Email")
+const { sendEmail, validator } = require("./utils/Email");    
 const { createToken } = require("./utils/JWT");
 require('dotenv').config();
 
@@ -343,7 +343,7 @@ app.post("/admin/verify", (req, res) => {
 app.use("/admin", adminAuth, admin);
 
 /*****************SERVICE PROVIDER*************/
-app.use("/service-provider/login", (req, res) => {
+app.post("/service-provider/login", (req, res) => {
 	try {
 		const { email } = req.body;
 
@@ -362,7 +362,7 @@ app.use("/service-provider/login", (req, res) => {
 					token = createToken(
 						result.email,
 						result._id,
-						process.env.USER_ROLE
+						process.env.SP_ROLE
 					),
 					(isSuccess) => {
 						if (isSuccess)
@@ -389,11 +389,12 @@ app.use("/service-provider/login", (req, res) => {
 				});
 		});
 	} catch (error) {
+		console.log("error", error);
 		res.status(400).json({ status: "error", result: { msg: error } });
 	}
 });
 
-app.use("/service-provider/signup", (req, res) => {
+app.post("/service-provider/signup", (req, res) => {
 	try {
 		const {
 			provider_id, f_name, l_name, email, phone_no, 
@@ -474,6 +475,11 @@ app.post("/service-provider/verify", (req, res) => {
 		const { token } = req.body;
 
 		jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+			console.log("Error: ", err);
+			console.log("ID : ", !decodedToken.hasOwnProperty("id"))
+			console.log("role : ", !decodedToken.hasOwnProperty("role"))
+			console.log("email: ", !decodedToken.hasOwnProperty("email"))
+			console.log("role is valid : ", decodedToken.role !== process.env.SP_ROLE)
 			if (
 				err ||
 				!decodedToken.hasOwnProperty("id") ||
@@ -501,9 +507,15 @@ app.post("/service-provider/verify", (req, res) => {
 		res.status(400).json({ status: "error" });
 	}
 });
-app.use("/service-provider", serviceProviderAuth, serviceProvider);
+// app.use("/service-provider", serviceProviderAuth, serviceProvider);
+app.get("/service-provider/getAppointment/:appointmentId", (req, res) => {
+	res.send({
+		status : "success",
+		result : req.params.appointmentId + "Yello" + req.body.token
+	})
+})
 
-//================================================================
+//================== SOME NOTIFICATION STUFF ======================
 
 app.post("/setWebhookClientRequests", async (req, res) => {
 	try {

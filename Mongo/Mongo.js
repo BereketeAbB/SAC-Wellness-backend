@@ -264,6 +264,29 @@ MongoDb.prototype.getAppointments = async function (reqQueryObj, callback){
 	}
 };
 
+MongoDb.prototype.getAppointment = async function (appointmentId, callback){
+	const appoint = await Appointment.findById({appointmentId})
+
+	if(appoint){
+		const ret = {
+			status: true,
+			result: appoint
+		}
+
+		callback(ret);
+	}else {
+		const ret = {
+			status: false,
+			result: {
+				data : {},
+				msg : "Appointment not found."
+			}
+		}
+
+		callback(ret);
+	}
+};
+
 //==================== Check >>>>>>>>>>>>>>>>>>>>>>>>
 MongoDb.prototype.checkAdmin = async function(email, callback){
     try {
@@ -285,7 +308,7 @@ MongoDb.prototype.checkAdmin = async function(email, callback){
 MongoDb.prototype.checkServiceProvider = async function(email, callback){
 	try {
 		const user = await ServiceProvider.findOne({email})
-
+		console.log(email, user);
         if(!user){
 			const ret = {status: false, msg: `No Service Provider with this email ${email}`}
             return callback(ret)
