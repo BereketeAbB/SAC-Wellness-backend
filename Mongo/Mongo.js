@@ -64,18 +64,29 @@ MongoDb.prototype.addStudent = async function (
 		diagnosis,
 	})
 	.then((data) => {
-			console.log(stud_id);
-			const ret = { status: true, ...data };
+			const ret = { 
+				status: true, 
+				result: {
+					msg: "Successfully added",
+					data 
+				}};
+				
 			callback(ret);
 		})
 		.catch((err) => {
-			console.log(err);
-			const ret = {status: false, msg: "Error while Inserting to Database", ...err}
+
+			const ret = {
+				status: false, 
+				result: {
+					msg: "Error while Inserting to Database",
+					err
+				}
+			}
 			callback(ret);
 		});
 };
 
-MongoDb.prototype.addServiceProvier = async function (
+MongoDb.prototype.addServiceProvider = async function (
 	provider_id, f_name, l_name, email, phone_no, 
 	telegram_id, educational_bkg, work_exp, 
 	office_location, available_at, callback
@@ -90,7 +101,14 @@ MongoDb.prototype.addServiceProvier = async function (
 			callback(ret);
 		})
 		.catch((err) => {
-			const ret = {status: false, msg: "Error while Inserting to Database", ...err}
+			const ret = {
+				status: false, 
+				result: {
+					msg: err.code == 11000 ? "user has already registerd" : "Error while Inserting to Database", 
+					error_code: err.code,
+					err
+				}
+			}
 			callback(ret);
 		});
 };
@@ -308,7 +326,6 @@ MongoDb.prototype.checkAdmin = async function(email, callback){
 MongoDb.prototype.checkServiceProvider = async function(email, callback){
 	try {
 		const user = await ServiceProvider.findOne({email})
-		console.log(email, user);
         if(!user){
 			const ret = {status: false, msg: `No Service Provider with this email ${email}`}
             return callback(ret)
@@ -326,10 +343,21 @@ MongoDb.prototype.checkStudent = async function(email, callback){
         const user = await Student.findOne({email})
 
         if(!user){
-            const ret = {status: false, msg: `No Stuednt with this email ${email}`}
+            const ret = {
+				status: false, 
+				result: {
+					msg: `No Stuednt with this email ${email}`
+				}
+			}
             return callback(ret)
         } else {
-            const ret = {status: true, _id: user._id, email: user.email}
+            const ret = {
+				status: true, 
+				result: {
+					_id: user._id,
+					email: user.email
+				}
+			}
             callback(ret)
         }
     } catch (error) {

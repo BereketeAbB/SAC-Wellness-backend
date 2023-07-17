@@ -27,6 +27,7 @@ const studentSchema = new mongoose.Schema({
 		department: String,
 	},
 	diagnosis: [{}, {}, {}],
+	
 });
 studentSchema.pre('save', function(next){
 	this.full_name = `${this.f_name} ${this.l_name}`
@@ -76,21 +77,22 @@ const serviceProviderSchema = new mongoose.Schema({
 	},
 	email: {
 		type: String,
-		required: [true, "Email cannot be emoty"],
+		required: [true, "Email cannot be empty"],
+		unique: true
 	},
 	phone_no: {
 		type: String,
 		required: [true, "Phone No cannot be empty"],
 	},
 	telegram_id: String,
-	educational_bkg: {
-		speciallity: {
-			type: String,
-			//
-		},
-		// Add Some Additional
-	},
-	work_exp: {},
+	educational_bkg: String,
+	// 	// speciallity: {
+	// 	// 	type: String,
+	// 	// 	//
+	// 	// },
+	// 	// // Add Some Additional
+	// },
+	work_exp: String,
 	office_location: String,
 	availabile_at: {
 		starting_time: {
