@@ -2,7 +2,7 @@ const express = require("express");
 const process = require("process");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-// const validator = require('validator')                                                                                                               );
+// const validator = require('validator') 		                                                                                                              );
 const mongoose = require('mongoose')
 // const {sendEmail} = require("./utils/Email")
 const { sendEmail, validator } = require("./utils/Email");    
@@ -91,13 +91,16 @@ app.use("/user/signup", (req, res) => {
 		} = req.body;
 
 		if (!validator.isEmail(email)) {
-			res.status(400).json({
-				status: "error",
-				result: "Invalid email : email should look like example@example.com",
+			res.status(412).json({
+				status: false,
+				result: {
+					msg: "Invalid email : email should look like example@example.com",
+				}
 			});
 			return;
 		}
 
+		
 		db.addStudent(
 			stud_id,
 			f_name,
@@ -112,9 +115,9 @@ app.use("/user/signup", (req, res) => {
 					db.checkStudent(email, (result) => {
 						if (result.status) {
 							sendEmail(
-								result.email,
+								result.result.email,
 								createToken(
-									result.email,
+									result.result.email,
 									result._id,
 									process.env.USER_ROLE
 								),
@@ -126,37 +129,45 @@ app.use("/user/signup", (req, res) => {
 												msg: "You should receive an email, with a verification token.",
 											},
 										});
-									else
+									else 
 										res.status(500).json({
-											status: "error",
-											result: error,
+											status: false,
+											result: {
+												msg: "Error Sending token to the student",
+											}
 										});
 								}
 							);
-						} else
+						} else {
 							res.status(401).json({
-								status: "error",
-								result: result.err,
+								status: false,
+								result: {
+									result,
+								}
 							});
+						}
 					});
 				} else {
-					res.status(400).json({
-						status: "error",
+					res.status(409).json({
+						status: false,
 						result: {
 							msg:
-								result.err.code === 11000
+								result.result.err.code === 11000
 									? "Email already exists."
 									: "Error in adding a user to database.",
-							err: result.err,
+							error_code: 11000
 						},
 					});
 				}
 			}
 		);
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({
-			status: "error",
-			result: { msg: "Error in the system." },
+			status: false,
+			result: { 
+				msg: "/user/signup Error in the system." 
+			},
 		});
 	}
 });
@@ -385,7 +396,10 @@ app.post("/service-provider/login", (req, res) => {
 			} else
 				res.status(401).json({
 					status: "unauthorized",
-					result: result,
+					result: {
+						msg: "check service provider error in sp_login",
+						result,
+					}
 				});
 		});
 	} catch (error) {
@@ -410,18 +424,28 @@ app.post("/service-provider/signup", (req, res) => {
 			return;
 		}
 
+		// db.checkServiceProvider(email, (result)=>{
+		// 	if(result.status){
+		// 		return res.status(401).json({
+		// 			status: false,
+		// 			result: {
+		// 				msg: "User has already registered."
+		// 			}
+		// 		})
+		// 	}
+		// })
 
-		db.addServiceProvdier(
+		db.addServiceProvider(
 			provider_id, f_name, l_name, email, phone_no, 
 			telegram_id, educational_bkg, work_exp, 
 			office_location, available_at,
 			(result) => {
 				if (result.status) {
-					db.checkServiceProvider({email}, (result) => {
+					db.checkServiceProvider(email, (result) => {
 						if (result.status) {
 							sendEmail(
 								result.email,
-								createToken(
+								token = createToken(
 									result.email,
 									result._id,
 									process.env.SP_ROLE
@@ -436,27 +460,30 @@ app.post("/service-provider/signup", (req, res) => {
 									});
 									else
 									res.status(500).json({
-										status: "E1: error",
-										result: error,
+										status: flase,
+										result: {
+											msg: "Nodemailer error",
+											error,
+										}
 									});
 								}
 							);
-						} else 
+						} else {
 							res.status(401).json({
-							status: "E2: error",
-							result: result.err,
+							status: false, 
+							result: {
+								msg: "Nodemailer doesnot found the email on the database",
+								error: result.err,
+							}
 						});
-						
+						}
 					});
 				} else {
 					res.status(400).json({
-						status: "error",
+						status: false,
 						result: {
-							msg:
-								result.err.code === 11000
-									? "Email already exists."
-									: "Error in adding a user to database.",
-							err: result.err,
+							msg: result.result.msg,
+							error_code: result.result.error_code
 						},
 					});
 				}
@@ -465,7 +492,10 @@ app.post("/service-provider/signup", (req, res) => {
 	} catch (error) {
 		res.status(500).json({
 			status: "error",
-			result: { msg: "Error in the system." },
+			result: { 
+				msg: "Error in the system.",
+				error
+			},
 		});
 	}
 });
@@ -489,7 +519,9 @@ app.post("/service-provider/verify", (req, res) => {
 			) {
 				res.status(403).json({
 					status: "error",
-					result: { msg: "Invalid token, please login again" },
+					result: { 
+						msg: "Invalid token, please login again"
+					},
 				});
 			} else {
 				res.cookie("token", token, {
@@ -504,7 +536,13 @@ app.post("/service-provider/verify", (req, res) => {
 			}
 		});
 	} catch (error) {
-		res.status(400).json({ status: "error" });
+		res.status(400).json({ 
+			status: false, 
+			result: {
+				msg: error.message,
+				error
+			}
+		});
 	}
 });
 // app.use("/service-provider", serviceProviderAuth, serviceProvider);
